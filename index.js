@@ -4,9 +4,11 @@ const client = new Discord.Client();
 
 // init count
 let channelCount = -1;
+// login discord bot
+client.login(process.env.TOKEN);
 
-// check how many people in the specific channel
-// and send the message when count changes.
+/* check how many people in the specific channel
+   and send the message when count changes. */
 const count = async () => {
   const channel = await client.channels.cache.find(
     (channel) => channel.id === process.env.COUNT_CHANNEL
@@ -28,10 +30,14 @@ const count = async () => {
   channelCount = curCount;
 };
 
-// every 1.5 seconds do count
-setInterval(() => {
-  count();
-}, 1500);
+/* Recursive setTimeout guarantees the given delay 
+   between the code execution completion and the next call.
+   But, setInterval doesn't guarantee the given delay. */
+const mySetInterval = () => {
+  setTimeout(async () => {
+    await count();
+    mySetInterval();
+  }, 1500);
+};
 
-// login discord bot
-client.login(process.env.TOKEN);
+mySetInterval();
