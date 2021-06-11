@@ -17,15 +17,7 @@ const getRandomInt = (min, max) => {
 };
 
 // compare comp with target
-const checkDiff = (origin, target) => {
-  let people = [];
-  for (let person of origin) {
-    if (!target.includes(person)) {
-      people.push(person);
-    }
-  }
-  return people;
-};
+const checkDiff = (origin, target) => origin.filter((x) => !target.includes(x));
 
 /* check how many people in the specific channel
    and send the message when count changes. */
@@ -34,14 +26,10 @@ const count = async () => {
     (channel) => channel.id === process.env.COUNT_CHANNEL
   );
 
-  const tmp = channel ? Array.from(channel.members) : [];
-  let curPeople = [];
+  const members = channel ? Array.from(channel.members) : [];
+  const curPeople = members.forEach((x) => x[1].user);
+  const curCount = members.length;
 
-  for (let i = 0; i < tmp.length; ++i) {
-    curPeople.push(`${tmp[i][1].user}`);
-  }
-
-  const curCount = channel ? channel.members.size : 0;
   if (channelCount === -1) {
     channelCount = curCount;
     channelPeople = curPeople;
