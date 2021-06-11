@@ -18,12 +18,13 @@ const getRandomInt = (min, max) => {
 
 // compare comp with target
 const checkDiff = (origin, target) => {
+  let people = [];
   for (let person of origin) {
     if (!target.includes(person)) {
-      return person;
+      people.push(person);
     }
   }
-  return '';
+  return people;
 };
 
 /* check how many people in the specific channel
@@ -33,31 +34,36 @@ const count = async () => {
     (channel) => channel.id === process.env.COUNT_CHANNEL
   );
 
-  const tmp = Array.from(channel.members);
+  const tmp = channel ? Array.from(channel.members) : [];
   let curPeople = [];
 
   for (let i = 0; i < tmp.length; ++i) {
-    curPeople.push(`${tmp[i][1].nickname}`);
+    curPeople.push(`${tmp[i][1].user}`);
   }
 
-  const curCount = channel.members.size;
+  const curCount = channel ? channel.members.size : 0;
   if (channelCount === -1) {
     channelCount = curCount;
     channelPeople = curPeople;
     return;
   }
+
   if (channelCount > curCount) {
-    const message = checkDiff(channelPeople, curPeople);
+    const people = checkDiff(channelPeople, curPeople);
 
-    await client.channels.cache
-      .find((channel) => channel.id === process.env.TARGET_CHANNEL)
-      .send(`${message} ${messageOut[getRandomInt(0, 2)]}`);
+    for (let person of people) {
+      await client.channels.cache
+        .find((channel) => channel.id === process.env.TARGET_CHANNEL)
+        .send(`${person} ${messageOut[getRandomInt(0, 2)]}`);
+    }
   } else if (channelCount < curCount) {
-    const message = checkDiff(curPeople, channelPeople);
+    const people = checkDiff(curPeople, channelPeople);
 
-    await client.channels.cache
-      .find((channel) => channel.id === process.env.TARGET_CHANNEL)
-      .send(`${message} 왔구나`);
+    for (let person of people) {
+      await client.channels.cache
+        .find((channel) => channel.id === process.env.TARGET_CHANNEL)
+        .send(`${person} 왔구나`);
+    }
   }
   channelCount = curCount;
   channelPeople = curPeople;
