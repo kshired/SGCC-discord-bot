@@ -18,7 +18,7 @@ const getRandomInt = (min, max) => {
 
 // compare comp with target
 const checkDiff = (origin, target) => {
-  for (let person of comp) {
+  for (let person of origin) {
     if (!target.includes(person)) {
       return person;
     }
