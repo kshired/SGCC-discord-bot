@@ -47,12 +47,14 @@ const count = async () => {
     return;
   }
   if (channelCount > curCount) {
-    const message = checkDiff(channelPeople, tmpPeople);
+    const message = checkDiff(channelPeople, curPeople);
+
     await client.channels.cache
       .find((channel) => channel.id === process.env.TARGET_CHANNEL)
       .send(`${message} ${messageOut[getRandomInt(0, 2)]}`);
   } else if (channelCount < curCount) {
-    const message = checkDiff(tmpPeople, channelPeople);
+    const message = checkDiff(curPeople, channelPeople);
+
     await client.channels.cache
       .find((channel) => channel.id === process.env.TARGET_CHANNEL)
       .send(`${message} 왔구나`);
