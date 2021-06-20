@@ -17,7 +17,15 @@ const getRandomInt = (min, max) => {
 };
 
 // compare comp with target
-const checkDiff = (origin, target) => origin.filter((x) => !target.includes(x));
+const checkDiff = (origin, target) => {
+  let people = [];
+  for (let person of origin) {
+    if (!target.includes(person)) {
+      people.push(person);
+    }
+  }
+  return people;
+};
 
 /* check how many people in the specific channel
    and send the message when count changes. */
@@ -27,7 +35,7 @@ const count = async () => {
   );
 
   const members = channel ? Array.from(channel.members) : [];
-  const curPeople = members.forEach((x) => x[1].user);
+  const curPeople = members.map((x) => x[1].user);
   const curCount = members.length;
 
   if (channelCount === -1) {
@@ -43,6 +51,12 @@ const count = async () => {
       await client.channels.cache
         .find((channel) => channel.id === process.env.TARGET_CHANNEL)
         .send(`${person} ${messageOut[getRandomInt(0, 2)]}`);
+    }
+
+    if (curCount === 0) {
+      await client.channels.cache
+        .find((channel) => channel.id === process.env.TARGET_CHANNEL)
+        .send(`내 인터넷 친구들 어디가써!`);
     }
   } else if (channelCount < curCount) {
     const people = checkDiff(curPeople, channelPeople);
