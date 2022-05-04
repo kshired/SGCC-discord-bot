@@ -1,6 +1,8 @@
 require('dotenv').config();
 const Discord = require('discord.js');
+const findData = require('./crawl_xkcd.js');
 const client = new Discord.Client();
+
 
 // init values
 let channelCount = -1;
@@ -9,6 +11,10 @@ const messageOut = ['어디가ㅏㅏㅏㅏㅏ', '가지마ㅏㅏㅏㅏ'];
 
 // login discord bot
 client.login(process.env.TOKEN);
+
+const getRandomImgUrl = () => {
+	return "https://picsum.photos/200/300";
+}
 
 const getRandomInt = (min, max) => {
   min = Math.ceil(min);
@@ -35,7 +41,9 @@ const count = async () => {
   );
 
   const members = channel ? Array.from(channel.members) : [];
-  const curPeople = members.map((x) => x[1].user);
+  const curPeople = members.map((x) => {
+	return x[1].displayName;
+  });
   const curCount = members.length;
 
   if (channelCount === -1) {
@@ -48,6 +56,7 @@ const count = async () => {
     const people = checkDiff(channelPeople, curPeople);
 
     for (let person of people) {
+	  console.log(JSON.stringify(person))
       await client.channels.cache
         .find((channel) => channel.id === process.env.TARGET_CHANNEL)
         .send(`${person} ${messageOut[getRandomInt(0, 2)]}`);
@@ -57,14 +66,18 @@ const count = async () => {
       await client.channels.cache
         .find((channel) => channel.id === process.env.TARGET_CHANNEL)
         .send(`내 인터넷 친구들 어디가써!`);
-    }
+	  const url = await findData();
+	  await client.channels.cache
+		.find((channel) => channel.id === process.env.TARGET_CHANNEL)
+		.send("random xkcd img", {files:[url]});
+	}
   } else if (channelCount < curCount) {
     const people = checkDiff(curPeople, channelPeople);
 
     for (let person of people) {
       await client.channels.cache
         .find((channel) => channel.id === process.env.TARGET_CHANNEL)
-        .send(`${person} 왔구나`);
+    	.send(`${person} 왔구나! 2학기 개강 D-${Math.floor((new Date("2022-09-01")-new Date())/(1000*3600*24))}!!!!`);
     }
   }
   channelCount = curCount;
@@ -82,3 +95,5 @@ const mySetInterval = () => {
 };
 
 mySetInterval();
+
+
